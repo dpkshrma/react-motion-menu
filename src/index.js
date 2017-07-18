@@ -85,30 +85,38 @@ export default class MotionMenu extends Component {
       : this.props.margin * (i + 1);
   }
 
-  getX(i, x) {
+  getX(i, x, angle) {
     const { type, margin, children } = this.props;
     if (type === 'horizontal') {
       return this.getDistance(i) + x;
     }
     if (type === 'circle') {
-      return x + (margin * Math.cos((Math.PI * 2 * i) / (children.length - 1)));
+      if (angle) {
+        return x + (margin * Math.cos(Math.PI * (angle/180)));
+      } else {
+        return x + (margin * Math.cos((Math.PI * 2 * i) / (children.length - 1)));
+      }
     }
     return x;
   }
 
-  getY(i, y) {
+  getY(i, y, angle) {
     const { type, margin, children } = this.props;
     if (type === 'vertical') {
       return this.getDistance(i) + y;
     }
     if (type === 'circle') {
-      return y + (margin * Math.sin((Math.PI * 2 * i) / (children.length - 1)));
+      if (angle) {
+        return y + (margin * Math.sin(Math.PI * -1 * (angle/180)));
+      } else {
+        return y + (margin * Math.sin((Math.PI * 2 * i) / (children.length - 1)));
+      }
     }
     return y;
   }
 
   getItems() {
-    const { x, y, bumpy } = this.props;
+    const { x, y, bumpy, children, angles } = this.props;
     return Array.from(Array(this.state.itemNumber).keys())
       .reverse()
       .map(i => (
@@ -118,8 +126,8 @@ export default class MotionMenu extends Component {
           name={`item${i + 1}`}
           onOpenAnimationEnd={this.onOpenEnd}
           onCloseAnimationEnd={this.onCloseEnd}
-          x={this.getX(i, x)}
-          y={this.getY(i, y)}
+          x={this.getX(i, x, children[i+1] && angles[children[i+1].key])}
+          y={this.getY(i, y, children[i+1] && angles[children[i+1].key])}
           bumpy={bumpy}
           openSpeed={this.props.openSpeed}
           reverse={this.props.reverse}
